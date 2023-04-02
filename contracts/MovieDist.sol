@@ -1,3 +1,4 @@
+//SPF-License-Identifier: UNLICENSED
 //Smart contract for a producer to distribute a movie to a theater
 //Information about the movie is stored in the blockchain and the producer can distribute the movie to a theater
 // Producer can store details like the movie name and price in the blockchain (MovieHash, MovieName, Price) 
@@ -59,42 +60,20 @@ contract MovieDist {
         return movieCount;
     }
 
-    function getMovieList() public view returns (bytes32[]) {
-        bytes32[] memory movieList = new bytes32[](movieCount);
-        for (uint i = 0; i < movieCount; i++) {
-            movieList[i] = movieList[i];
-        }
-        return movieList;
+    //Get movie details function to get the details of a movie (finds all the movie hashes from movieList and returns the details of the movie)
+    function getMovieDetails(uint index) public view returns (bytes32, string, uint, address) {
+        bytes32 movieHash = movieList[index];
+        return (movieHash, movies[movieHash].name, movies[movieHash].price, movies[movieHash].theater);
     }
 }
 
-//     mapping (bytes32 => Movie) public movies;
-//     mapping (address => uint) public balances;
-    
-//     function addMovie(bytes32 movieHash, string name, uint price) public {
-//         require(!movies[movieHash].isValue);
-//         movies[movieHash] = Movie(name, price, 0, true);
-//     }
-    
-//     function buyMovie(bytes32 movieHash) public payable {
-//         require(movies[movieHash].isValue);
-//         require(msg.value == movies[movieHash].price);
-//         movies[movieHash].theater = msg.sender;
-//         balances[msg.sender] += msg.value;
-//     }
-    
-//     function sendMovie(bytes32 movieHash, address theater) public {
-//         require(movies[movieHash].isValue);
-//         require(movies[movieHash].theater == theater);
-//         balances[theater] += movies[movieHash].price;
-//         movies[movieHash].theater = 0;
-//     }
-    
-//     function withdraw(uint amount) public {
-//         require(balances[msg.sender] >= amount);
-//         balances[msg.sender] -= amount;
-//         msg.sender.transfer(amount);
-//     }
-// }
 
-//The MovieDist.sol file contains the smart contract for a producer to distribute a movie to a theater. The producer can store details like the movie name and price in the blockchain (MovieHash, MovieName, Price). The theater can buy the movie (MovieHash) and the producer can send the movie to the theater (MovieHash, TheaterAddress). The producer can also withdraw the money from the contract (MovieHash, Amount).
+/*
+ Functions implemented:
+    addMovie(bytes32 movieHash, string name, uint price) public
+    buyMovie(bytes32 movieHash) public payable
+    sendMovie(bytes32 movieHash, address theater) public
+    withdraw(uint amount) public
+    getMovieCount() public view returns (uint)
+    getMovieDetails(uint index) public view returns (bytes32, string, uint, address)
+*/
