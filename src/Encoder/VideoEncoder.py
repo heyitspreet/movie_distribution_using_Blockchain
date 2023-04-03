@@ -57,14 +57,15 @@ def extract_string_from_video(video_path):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         print("Could not open video file")
-        return
+        return ""
 
     # Get the video properties
     fps = cap.get(cv2.CAP_PROP_FPS)
     frame_size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-    # Initialize the hidden string
-    hidden_string = ''
+    # Initialize the extracted string and hidden string buffer
+    extracted_string = ""
+    extracted_hidden_string = ""
 
     # Extract the hidden string from each frame
     while True:
@@ -76,16 +77,27 @@ def extract_string_from_video(video_path):
         # Extract one bit of the hidden string from each pixel's red channel
         for y in range(frame_size[1]):
             for x in range(frame_size[0]):
-                pixel = list(frame[y, x])
-                hidden_string += str(pixel[2] & 1)
+                pixel = frame[y, x]
+                extracted_hidden_string += str(pixel[2] & 1)
 
-    # Convert the binary string to ASCII
-    n = int(hidden_string, 2)
-    hidden_string = n.to_bytes((n.bit_length() + 7) // 8, 'big').decode()
+                # If the hidden string buffer has 256 bits (32 bytes), extract the next character
+                if len(extracted_hidden_string) == 256:
+                    extracted_string += chr(int(extracted_hidden_string, 2))
+                    extracted_hidden_string = ""
+
+                    # If the extracted character is the null terminator, we've reached the end of the hidden string
+                    if extracted_string[-1] == "\0":
+                        cap.release()
+                        return extracted_string[:-1]
+
+        # If we've extracted a null character but haven't found the end of the hidden string yet, there's a problem
+        if "\0" in extracted_string:
+            print("Error: null character found before end of hidden string")
+            cap.release()
+            return ""
 
     cap.release()
-
-    return hidden_string
+    return extracted_string
 
 if __name__ == '__main__':
     #print opencv version
@@ -95,5 +107,6 @@ if __name__ == '__main__':
     # print the hash of the video file
     print(hashlib.md5(open('video_embedded.mp4', 'rb').read()).hexdigest())
     # Extract the hidden string from a video
+    print("Extracted string: ")
     print(extract_string_from_video('video_embedded.mp4'))
 
