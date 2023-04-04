@@ -1,0 +1,2 @@
+metamask_password = RandomPassword
+metamask_recovery_phrase = october join fix thought goose shuffle pencil certain holiday affair food lunar

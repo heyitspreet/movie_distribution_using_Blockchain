@@ -6,6 +6,7 @@
 // The producer can also withdraw the money from the contract (MovieHash, Amount)
 
 pragma solidity ^0.4.0;
+pragma experimental ABIEncoderV2;
 
 contract MovieDist {
     struct Movie {
@@ -36,6 +37,7 @@ contract MovieDist {
     //function to buy a movie
     function buyMovie(bytes32 movieHash) public payable {
         require(movies[movieHash].isValue);
+        require(movies[movieHash].theater == 0);
         require(msg.value == movies[movieHash].price);
         movies[movieHash].theater = msg.sender;
         balances[msg.sender] += msg.value;
@@ -64,6 +66,20 @@ contract MovieDist {
     function getMovieDetails(uint index) public view returns (bytes32, string, uint, address) {
         bytes32 movieHash = movieList[index];
         return (movieHash, movies[movieHash].name, movies[movieHash].price, movies[movieHash].theater);
+    }
+    function getAllMovieDetails() public view returns (bytes32[], string[], uint[], address[]) {
+        bytes32[] memory movieHashes = new bytes32[](movieCount);
+        string[] memory movieNames = new string[](movieCount);
+        uint[] memory moviePrices = new uint[](movieCount);
+        address[] memory movieTheaters = new address[](movieCount);
+        for (uint i = 0; i < movieCount; i++) {
+            bytes32 movieHash = movieList[i];
+            movieHashes[i] = movieHash;
+            movieNames[i] = movies[movieHash].name;
+            moviePrices[i] = movies[movieHash].price;
+            movieTheaters[i] = movies[movieHash].theater;
+        }
+        return (movieHashes, movieNames, moviePrices, movieTheaters);
     }
 }
 
